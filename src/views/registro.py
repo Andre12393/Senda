@@ -146,12 +146,12 @@ def registro(page: ft.Page):
             ft.TextButton(
                 ft.Text("Ya tengo una cuenta", size=16, weight=ft.FontWeight.W_600, color=ft.Colors.ON_SURFACE),
                 width=300,
-                style=ft.ButtonStyle(bgcolor=ft.Colors.SURFACE_CONTAINER, padding=15, shape=ft.RoundedRectangleBorder(radius=10)),
+                style=ft.ButtonStyle(padding=15, shape=ft.RoundedRectangleBorder(radius=10)),
                 margin=ft.Margin(top=5),
                 on_click=lambda _: page.go("/sesion")
             )
         ],
-        margin=ft.Margin(2),
+        margin=ft.Margin(3),
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         vertical_alignment=ft.MainAxisAlignment.CENTER,
         spacing=0
