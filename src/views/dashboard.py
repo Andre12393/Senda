@@ -2,9 +2,23 @@ import flet as ft
 from controllers.UsuarioCtrl import UsuarioCtrl
 
 def dashboard(page: ft.Page):
-    # user = UsuarioCtrl().obtener_data(page.session.store.get("user"), "nombre")
-    # nombre_usuario = "Usuario" if not user else user["nombre"] # type: ignore
-    # nombre_usuario = nombre_usuario if len(nombre_usuario) <= 10 else nombre_usuario[:7] + "..."
+    user = UsuarioCtrl().obtener_data(page.session.store.get("user"), "nombres, especialidad")
+    
+    icono_perfil: ft.IconData | str
+    if user:
+        if user["especialidad"] == "programacion":
+            icono_perfil = "assets/icons/code_xml.svg"
+            
+        elif user["especialidad"] == "electronica":
+            icono_perfil = ft.Icons.MEMORY_ROUNDED
+            
+        elif user["especialidad"] == "contabilidad":
+            icono_perfil = ft.Icons.BALANCE_ROUNDED
+            
+        elif user["especialidad"] == "electricidad":
+            icono_perfil = ft.Icons.ELECTRIC_BOLT_ROUNDED
+    
+    nombre_usuario = ("Usuario" if not user else user["nombres"]).title()
     
     return ft.View(
         route="/dashboard",

@@ -49,7 +49,7 @@ def sesion(page: ft.Page):
                     alert_email.visible = alert_passw.visible = True
             else:
                 page.session.store.set("user", email.value)
-                page.go("/perfil")
+                page.go("/dashboard")
             
         page.update()
     

@@ -7,8 +7,8 @@ def perfil(page: ft.Page):
             ft.Icon(ft.Icons.ERROR_OUTLINE, size=12, color=ft.Colors.ERROR, margin=ft.Margin(top=2)),
             ft.Text("", size=12, color=ft.Colors.ERROR, expand=True)
         ],
-        width=300,
-        margin=ft.Margin(25, 2, bottom=5),
+        alignment=ft.MainAxisAlignment.CENTER,
+        margin=ft.Margin(15, bottom=2),
         visible=False
     )
     
@@ -16,32 +16,40 @@ def perfil(page: ft.Page):
         ft.Container(
             ft.Column(
                 [
-                    ft.Text("¿Estas seguro de que quieres eliminar tu cuenta?", size=15, text_align=ft.TextAlign.CENTER),
-                    ft.TextButton(
-                        ft.Text("Cancelar", size=20, color=ft.Colors.ON_SURFACE, weight=ft.FontWeight.W_600),
-                        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=15),
-                        width=300,
-                        margin=ft.Margin(top=25, bottom=5),
-                        on_click=lambda _: cerrar_alertD()
-                    ),
-                    ft.FilledButton(
-                        ft.Text("Eliminar mi cuenta", size=20, color=ft.Colors.WHITE, weight=ft.FontWeight.W_600),
-                        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=15),
-                        bgcolor=ft.Colors.RED,
-                        width=300,
-                        on_click=lambda _: eliminar_cuenta(page.session.store.get("user"))
-                    ),
-                    alert_eliminar
+                    ft.IconButton(ft.Icons.CLOSE_ROUNDED, align=ft.Alignment.TOP_RIGHT, on_click=lambda _: cerrar_alertD()),
+                    ft.Container(
+                        ft.Column(
+                            [
+                                ft.Text(
+                                    "¿Estas seguro de que quieres eliminar tu cuenta?",
+                                    size=15,
+                                    text_align=ft.TextAlign.CENTER,
+                                    margin=ft.Margin(bottom=25, top=5)
+                                ),
+                                alert_eliminar,
+                                ft.FilledButton(
+                                    ft.Text("Eliminar mi cuenta", size=20, color=ft.Colors.WHITE, weight=ft.FontWeight.W_600),
+                                    style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=15),
+                                    bgcolor=ft.Colors.RED,
+                                    width=300,
+                                    margin=ft.Margin(bottom=10),
+                                    on_click=lambda _: eliminar_cuenta(page.session.store.get("user"))
+                                )
+                            ],
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                            spacing=0,
+                        ),
+                        padding=ft.Padding(15, 0, 15, 0)
+                    )
                 ],
-                spacing=5,
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=10,
                 tight=True
-            ), 
-            width=300,
-            padding=15
+            ),
+            padding=5
         ),
         bgcolor=ft.Colors.SURFACE,
-        shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius(15, 15, 0, 0))
+        shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius(20, 20, 0, 0))
     )
     
     page.overlay.append(sheet_eliminar)
@@ -69,7 +77,23 @@ def perfil(page: ft.Page):
         
         page.update()
     
-    user = UsuarioCtrl().obtener_data(page.session.store.get("user"), "nombres, apellidos")
+    
+    user = UsuarioCtrl().obtener_data(page.session.store.get("user"), "nombres, apellidos, especialidad")
+    
+    icono_perfil: ft.IconData | str
+    if user:
+        if user["especialidad"] == "programacion":
+            icono_perfil = "assets/icons/code_xml.svg"
+            
+        elif user["especialidad"] == "electronica":
+            icono_perfil = ft.Icons.MEMORY_ROUNDED
+            
+        elif user["especialidad"] == "contabilidad":
+            icono_perfil = ft.Icons.BALANCE_ROUNDED
+            
+        elif user["especialidad"] == "electricidad":
+            icono_perfil = ft.Icons.ELECTRIC_BOLT_ROUNDED
+    
     nombre_usuario = ("Usuario" if not user else f"{user["nombres"]} {user["apellidos"]}").title()
     
     return ft.View(
@@ -96,7 +120,9 @@ def perfil(page: ft.Page):
             ),
             ft.Divider(),
             ft.Container(
-                ft.Icon(ft.Icons.PERSON, size=125, color=ft.Colors.WHITE_70),
+                ft.Icon(icono_perfil, size=125, color=ft.Colors.SURFACE) 
+                if isinstance(icono_perfil, ft.IconData) else 
+                ft.Image(icono_perfil, width=125, color=ft.Colors.SURFACE),
                 bgcolor=ft.Colors.SURFACE_CONTAINER,
                 shape=ft.BoxShape.CIRCLE,
                 margin=ft.Margin(top=25),
