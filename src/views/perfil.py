@@ -33,7 +33,7 @@ def perfil(page: ft.Page):
                                     bgcolor=ft.Colors.RED,
                                     width=300,
                                     margin=ft.Margin(bottom=10),
-                                    on_click=lambda _: eliminar_cuenta(page.session.store.get("user"))
+                                    on_click=lambda _: eliminar_cuenta(page.session.store.get("user")) # type: ignore
                                 )
                             ],
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -65,7 +65,7 @@ def perfil(page: ft.Page):
         page.session.store.clear()
         page.go("/sesion")
     
-    def eliminar_cuenta(email):
+    def eliminar_cuenta(email: str):
         alert_eliminar.visible = False
         
         is_valid, mensaje = UsuarioCtrl().eliminar_cuenta(email)
@@ -78,7 +78,7 @@ def perfil(page: ft.Page):
         page.update()
     
     
-    user = UsuarioCtrl().obtener_data(page.session.store.get("user"), "nombres, apellidos, especialidad")
+    user = UsuarioCtrl().obtener_data(page.session.store.get("user"), "nombres, apellidos, especialidad") # type: ignore
     
     icono_perfil: ft.IconData | str
     if user:

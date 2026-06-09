@@ -2,113 +2,99 @@ import flet as ft
 from controllers.MateriaCtrl import MateriaCtrl
 
 def materias(page: ft.Page):
-    ctrl = MateriaCtrl()
-    email = page.session.store.get("user")
-    materias_lista = ft.Column(spacing=8, scroll=ft.ScrollMode.AUTO, expand=True)
+    nombre = ft.TextField(label="Nombre de la Materia", width=300)
+    alert_nombre = ft.Row(
+        [
+            ft.Icon(ft.Icons.ERROR_OUTLINE, size=12, color=ft.Colors.ERROR, margin=ft.Margin(top=2)),
+            ft.Text("", size=12, color=ft.Colors.ERROR, expand=True)
+        ],
+        width=300,
+        margin=ft.Margin(15, 2, bottom=5),
+        visible=False
+    )
+    
+    parcial_1 = ft.TextField(
+        label="Parcial 1",
+        width=75,
+        keyboard_type=ft.KeyboardType.NUMBER,
+        on_change=lambda _: calcular_promedio()
+    )
 
-    nombre = ft.TextField(label="Materia", expand=True)
-    p1 = ft.TextField(label="Parcial 1", width=100, keyboard_type=ft.KeyboardType.NUMBER)
-    p2 = ft.TextField(label="Parcial 2", width=100, keyboard_type=ft.KeyboardType.NUMBER)
-    p3 = ft.TextField(label="Parcial 3", width=100, keyboard_type=ft.KeyboardType.NUMBER)
-    error = ft.Text("", color=ft.Colors.ERROR, size=12)
+    parcial_2 = ft.TextField(
+        label="Parcial 2",
+        width=75,
+        keyboard_type=ft.KeyboardType.NUMBER,
+        on_change=lambda _: calcular_promedio()
+    )
 
-    def hacer_card(m):
-        califs = [c for c in [m["parcial1"], m["parcial2"], m["parcial3"]] if c is not None]
-        color = ft.Colors.GREEN if m["promedio"] >= 6 else ft.Colors.ERROR
-        card = ft.Card()
-        card.content = ft.ListTile(
-            title=ft.Text(m["nombre"], weight=ft.FontWeight.W_600),
-            subtitle=ft.Text("  ".join([f"P{i+1}: {c}" for i, c in enumerate(califs)])),
-            trailing=ft.Row(
-                [
-                    ft.Text(f"Prom: {m['promedio']:.1f}", color=color, weight=ft.FontWeight.W_700),
-                    ft.IconButton(
-                        ft.Icons.DELETE_OUTLINE,
-                        icon_color=ft.Colors.ERROR,
-                        data=(m["id"], card),
-                        on_click=lambda e: borrar(e.control.data)
-                    )
-                ],
-                spacing=0,
-                tight=True
-            )
-        )
-        
-        return card
+    parcial_3 = ft.TextField(
+        label="Parcial 3",
+        width=75,
+        keyboard_type=ft.KeyboardType.NUMBER,
+        on_change=lambda _: calcular_promedio()
+    )
+    
+    alert_parcial = ft.Row(
+        [
+            ft.Icon(ft.Icons.ERROR_OUTLINE, size=12, color=ft.Colors.ERROR, margin=ft.Margin(top=2)),
+            ft.Text("", size=12, color=ft.Colors.ERROR, expand=True)
+        ],
+        width=300,
+        margin=ft.Margin(15, 2, bottom=5),
+        visible=False
+    )
 
-    def borrar(data):
-        id, card = data
-        ctrl.eliminar(id)
-        materias_lista.controls.remove(card)
+    promedio = ft.Text("0", size=20, weight=ft.FontWeight.W_600, align=ft.Alignment.CENTER)
+    
+    def calcular_promedio():
+        promedio.value = f"{((float(parcial_1.value) + float(parcial_2.value) + float(parcial_3.value)) / 3):g}"
         page.update()
-
-    def agregar(_):
-        if not nombre.value:
-            error.value = "Ingresa el nombre de la materia."
-            page.update()
-            return
-
-        try:
-            califs = [float(p.value) for p in [p1, p2, p3] if p.value]
-        except ValueError:
-            error.value = "Las calificaciones deben ser números."
-            page.update()
-            return
-
-        if not califs:
-            error.value = "Ingresa al menos una calificación."
-            page.update()
-            return
-
-        promedio = sum(califs) / len(califs)
-        vals = [float(p.value) if p.value else None for p in [p1, p2, p3]]
-        id = ctrl.crear(email, nombre.value, vals[0], vals[1], vals[2], promedio)
-
-        if id:
-            materias_lista.controls.append(hacer_card({
-                "id": id, "nombre": nombre.value,
-                "parcial1": vals[0], "parcial2": vals[1], "parcial3": vals[2],
-                "promedio": promedio
-            }))
-            nombre.value = ""
-            p1.value = ""
-            p2.value = ""
-            p3.value = ""
-            error.value = ""
-        else:
-            error.value = "Error al guardar la materia."
-
-        page.update()
-
-    # Cargar materias existentes
-    for m in ctrl.obtener(email):
-        materias_lista.controls.append(hacer_card(m))
-
+    
+    def guardarClick():
+        return
+    
     return ft.View(
         route="/materias",
         controls=[
-            ft.AppBar(
-                title=ft.Text("Materias y Calificaciones", weight=ft.FontWeight.W_600),
-                bgcolor=ft.Colors.SURFACE_CONTAINER,
-                leading=ft.IconButton(ft.Icons.ARROW_BACK, on_click=lambda _: page.go("/dashboard"))
+            ft.Row(
+                [
+                    ft.IconButton(
+                        ft.Icons.ARROW_BACK,
+                        align=ft.Alignment.CENTER_LEFT,
+                        margin=ft.Margin(top=2),
+                        on_click=lambda _: page.go("/dashboard")
+                    ),
+                    ft.Text(
+                        "Añadir Materia",
+                        size=20,
+                        weight=ft.FontWeight.W_600,
+                        align=ft.Alignment.CENTER,
+                        expand=True,
+                        margin=ft.Margin(right=50)
+                    )
+                ],
+                margin=ft.Margin(bottom=5)
             ),
-            ft.Container(
-                ft.Column(
-                    [
-                        ft.Row([nombre], alignment=ft.MainAxisAlignment.CENTER),
-                        ft.Row([p1, p2, p3], alignment=ft.MainAxisAlignment.CENTER),
-                        error,
-                        ft.ElevatedButton("Agregar Materia", icon=ft.Icons.ADD, on_click=agregar),
-                        ft.Divider(),
-                        materias_lista,
-                    ],
-                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=10,
-                    expand=True
-                ),
-                padding=20,
-                expand=True
+            ft.Divider(),
+            ft.Column(
+                [
+                    nombre,
+                    alert_nombre,
+                    ft.Row(
+                        [parcial_1, parcial_2, parcial_3]
+                    ),
+                    alert_parcial,
+                    promedio,
+                    ft.FilledButton(
+                        "Guardar",
+                        width=300,
+                        on_click=lambda _: guardarClick()
+                    )
+                ]
             )
         ],
-        bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST
+        margin=ft.Margin(3),
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        vertical_alignment=ft.MainAxisAlignment.CENTER,
+        spacing=0
     )

@@ -1,12 +1,13 @@
 import bcrypt
 import mysql.connector
+from typing import Literal
 from models.Database import Database
 
 class UsuarioModel:
     def __init__(self, db: Database):
         self.db = db
     
-    def data(self, email, campo = "*"):
+    def data(self, email: str, campo: str = "*"):
         try:
             conn = self.db.get_connection()
             cursor = conn.cursor(dictionary=True) # type: ignore
@@ -22,7 +23,7 @@ class UsuarioModel:
             cursor.close()
             conn.close() # type: ignore
     
-    def iniciar_sesion(self, email, passw):
+    def iniciar_sesion(self, email: str, passw: str):
         try:
             conn = self.db.get_connection()
             cursor = conn.cursor(dictionary=True) # type: ignore
@@ -45,7 +46,7 @@ class UsuarioModel:
             cursor.close()
             conn.close() # type: ignore
     
-    def registrar(self, nombres, apellidos, especialidad, email, passw):
+    def registrar(self, nombres: str, apellidos: str, especialidad: Literal["programacion", "electronica", "contabilidad", "electricidad"], email: str, passw: str):
         try:
             conn = self.db.get_connection()
             cursor = conn.cursor() # type: ignore
@@ -67,7 +68,7 @@ class UsuarioModel:
             cursor.close()
             conn.close() # type: ignore
     
-    def eliminar(self, email):
+    def eliminar(self, email: str):
         try:
             conn = self.db.get_connection()
             cursor = conn.cursor() # type: ignore

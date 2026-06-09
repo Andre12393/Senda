@@ -35,6 +35,6 @@ def main(page: ft.Page):
         page.update()
 
     page.on_route_change = lambda _: route_change()
-    page.go("/sesion")
+    page.go("/materias")
 
 ft.app(main)
