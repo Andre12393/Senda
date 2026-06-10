@@ -1,10 +1,27 @@
 import flet as ft
+from typing import Callable
 from decimal import Decimal
 
 class Materia(ft.Card):
-    def __init__(self, nombre: str, parcial_1: Decimal, parcial_2: Decimal, parcial_3: Decimal, promedio: Decimal):
+    modo_eliminar = False
+    
+    def __init__(self, id: int, nombre: str, parcial_1: Decimal, parcial_2: Decimal, parcial_3: Decimal, promedio: Decimal, onClick: ft.ControlEventHandler[ft.IconButton]):
+        self.txt_promedio = ft.Text(
+            f"{float(promedio):g}",
+            size=20,
+            weight=ft.FontWeight.W_500,
+            visible=not Materia.modo_eliminar
+        )
+        
+        self.btn_eliminar = ft.IconButton(
+            ft.Icons.DELETE,
+            data=id,
+            visible=Materia.modo_eliminar,
+            on_click=onClick
+        )
+        
         super().__init__(
-            content=ft.Row(
+            ft.Row(
                 [
                     ft.Column(
                         [
@@ -18,7 +35,19 @@ class Materia(ft.Card):
                             )
                         ]
                     ),
-                    ft.Text(f"{float(promedio):g}", size=16, weight=ft.FontWeight.W_600, color=ft.Colors.DEEP_ORANGE)
+                    ft.Row(
+                        [
+                            self.txt_promedio,
+                            self.btn_eliminar
+                        ]
+                    )
                 ]
             )
         )
+        
+        self.variant = ft.CardVariant.OUTLINED
+    
+    def cambiar_modo(self):
+        self.txt_promedio.visible = not Materia.modo_eliminar
+        self.btn_eliminar.visible = Materia.modo_eliminar
+        self.update()

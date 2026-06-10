@@ -8,7 +8,7 @@ class MateriaCtrl:
     def __init__(self):
         self.model = MateriaModel(Database())
 
-    def obtener(self, email_usuario: str):
+    def obtener_data(self, email_usuario: str):
         return self.model.data(email_usuario)
 
     def crear(self, email_usuario: str, nombre: str, parcial_1: Decimal, parcial_2: Decimal, parcial_3: Decimal):

@@ -3,7 +3,6 @@ from views.sesion import sesion
 from views.registro import registro
 from views.dashboard import dashboard
 from views.perfil import perfil
-from views.materias import materias
 
 def main(page: ft.Page):
     page.title = "Senda"
@@ -28,13 +27,10 @@ def main(page: ft.Page):
         
         elif page.route == "/perfil":
             page.views.append(perfil(page))
-        
-        elif page.route == "/materias":
-            page.views.append(materias(page))
             
         page.update()
 
     page.on_route_change = lambda _: route_change()
-    page.go("/materias")
+    page.go("/sesion")
 
 ft.app(main)
