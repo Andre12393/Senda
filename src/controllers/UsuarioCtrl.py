@@ -24,17 +24,17 @@ class UsuarioCtrl:
             elif "passw" in err.errors()[0]['loc']:
                 return False, "La contraseña debe tener entre 8 y 255 caracteres"
     
-    def registrar(self, nombre_completo: str, apellidos: str, especialidad: Literal["programacion", "electronica", "contabilidad", "electricidad"], email: str, passw: str):
+    def registrar(self, nombres: str, apellidos: str, especialidad: Literal["programacion", "electronica", "contabilidad", "electricidad"], email: str, passw: str):
         try:
             data = UsuarioRegistro_Schema(
-                nombre_completo=nombre_completo,
+                nombres=nombres,
                 apellidos=apellidos,
                 especialidad=especialidad,
                 email=email,
                 passw=passw
             )
             
-            return self.model.registrar(data.nombre_completo, data.apellidos, data.especialidad, data.email, data.passw)
+            return self.model.registrar(data.nombres, data.apellidos, data.especialidad, data.email, data.passw)
             
         except ValidationError as err:
             print(f"Error de validación en registrar: {err}")
