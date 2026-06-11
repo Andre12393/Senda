@@ -11,7 +11,7 @@ class MateriaCtrl:
     def obtener_data(self, email_usuario: str):
         return self.model.data(email_usuario)
 
-    def crear(self, email_usuario: str, nombre: str, parcial_1: Decimal, parcial_2: Decimal, parcial_3: Decimal):
+    def crear_materia(self, email_usuario: str, nombre: str, parcial_1, parcial_2, parcial_3):
         try:
             data = Materia_Schema(nombre=nombre, parcial_1=parcial_1, parcial_2=parcial_2, parcial_3=parcial_3)
             return self.model.crear(email_usuario, data.nombre, data.parcial_1, data.parcial_2, data.parcial_3)
@@ -24,5 +24,8 @@ class MateriaCtrl:
             elif any(p in err.errors()[0]['loc'] for p in ["parcial_1", "parcial_2", "parcial_3"]):
                 return False, "Los parciales deben ser números entre 0 y 10, con hasta un decimal"
 
-    def eliminar(self, id: int):
+    def eliminar_materia(self, id: int):
         return self.model.eliminar(id)
+    
+    def vaciar_materias(self, email_usuario: str):
+        return self.model.vaciar(email_usuario)

@@ -60,3 +60,21 @@ class MateriaModel:
         finally:
             cursor.close()
             conn.close() # type: ignore
+    
+    def vaciar(self, email_usuario: str):
+        try:
+            conn = self.db.get_connection()
+            cursor = conn.cursor() # type: ignore
+            
+            cursor.execute("DELETE FROM materias WHERE email_usuario = %s", (email_usuario,))
+            
+            conn.commit() # type: ignore
+            return True, ""
+        
+        except mysql.connector.Error as err:
+            print(f"Error en eliminar: {err}")
+            return False, "Hubo un error al intentar vaciar todas las materias, inténtalo de nuevo"
+        
+        finally:
+            cursor.close()
+            conn.close() # type: ignore

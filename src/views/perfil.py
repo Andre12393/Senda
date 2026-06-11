@@ -16,34 +16,24 @@ def perfil(page: ft.Page):
         ft.Container(
             ft.Column(
                 [
-                    ft.IconButton(ft.Icons.CLOSE_ROUNDED, align=ft.Alignment.TOP_RIGHT, on_click=lambda _: cerrar_alertD()),
-                    ft.Container(
-                        ft.Column(
-                            [
-                                ft.Text(
-                                    "¿Estas seguro de que quieres eliminar tu cuenta?",
-                                    size=15,
-                                    text_align=ft.TextAlign.CENTER,
-                                    margin=ft.Margin(bottom=25, top=5)
-                                ),
-                                alert_eliminar,
-                                ft.FilledButton(
-                                    ft.Text("Eliminar mi cuenta", size=20, color=ft.Colors.WHITE, weight=ft.FontWeight.W_600),
-                                    style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=15),
-                                    bgcolor=ft.Colors.RED,
-                                    width=300,
-                                    margin=ft.Margin(bottom=10),
-                                    on_click=lambda _: eliminar_cuenta(page.session.store.get("user")) # type: ignore
-                                )
-                            ],
-                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                            spacing=0,
-                        ),
-                        padding=ft.Padding(15, 0, 15, 0)
+                    ft.Text(
+                        "¿Estas seguro de que quieres eliminar tu cuenta?",
+                        size=15,
+                        text_align=ft.TextAlign.CENTER,
+                        margin=ft.Margin(bottom=25, top=15)
+                    ),
+                    alert_eliminar,
+                    ft.FilledButton(
+                        ft.Text("Eliminar mi cuenta", size=20, color=ft.Colors.WHITE, weight=ft.FontWeight.W_600),
+                        style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=15),
+                        bgcolor=ft.Colors.RED,
+                        width=300,
+                        margin=ft.Margin(bottom=10),
+                        on_click=lambda _: eliminar_cuenta() # type: ignore
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                spacing=10,
+                spacing=0,
                 tight=True
             ),
             padding=5
@@ -53,22 +43,18 @@ def perfil(page: ft.Page):
     )
     
     page.overlay.append(sheet_eliminar)
-    def abrir_alertD():
+    def abrir_shtEliminar():
         sheet_eliminar.open = True
         page.update()
     
-    def cerrar_alertD():
-        sheet_eliminar.open = False
-        page.update()
-    
-    def cerrar_sesionClick():
+    def cerrar_sesion():
         page.session.store.clear()
         page.go("/sesion")
     
-    def eliminar_cuenta(email: str):
+    def eliminar_cuenta():
         alert_eliminar.visible = False
         
-        is_valid, mensaje = UsuarioCtrl().eliminar_cuenta(email)
+        is_valid, mensaje = UsuarioCtrl().eliminar_cuenta(page.session.store.get("user")) # type: ignore
         if not is_valid:
             alert_eliminar.controls[1].value = mensaje # type: ignore
             alert_eliminar.visible = True
@@ -141,7 +127,7 @@ def perfil(page: ft.Page):
                 style=ft.ButtonStyle(shape=ft.RoundedRectangleBorder(radius=10), padding=15),
                 width=300,
                 margin=ft.Margin(bottom=10),
-                on_click=lambda _: cerrar_sesionClick()
+                on_click=lambda _: cerrar_sesion()
             ),
             ft.FilledButton(
                 ft.Text("Eliminar cuenta", size=20, color=ft.Colors.WHITE, weight=ft.FontWeight.W_600),
@@ -150,7 +136,7 @@ def perfil(page: ft.Page):
                 width=300,
                 margin=ft.Margin(bottom=8),
                 align=ft.Alignment.BOTTOM_CENTER,
-                on_click=lambda _: abrir_alertD()
+                on_click=lambda _: abrir_shtEliminar()
             )
         ],
         margin=ft.Margin(3),
