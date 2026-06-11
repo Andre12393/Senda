@@ -23,7 +23,7 @@ def dashboard(page: ft.Page):
                 lambda e: eliminar_materia(e)
             ) for m in MateriaCtrl().obtener_data(page.session.store.get("user")) # type: ignore
         ],
-        height=275,
+        height=300,
         margin=ft.Margin(1, 2, 1, 2),
         spacing=5,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -156,7 +156,7 @@ def dashboard(page: ft.Page):
     )
     
     btn_vaciar = ft.FilledButton(
-        ft.Text("Vaciar materias", size=30, color=ft.Colors.WHITE),
+        ft.Text("Vaciar materias", size=25, color=ft.Colors.WHITE),
         style=ft.ButtonStyle(bgcolor=ft.Colors.RED, padding=15),
         width=325,
         on_click=lambda _: abrir_shtEliminar(),
@@ -400,6 +400,7 @@ def dashboard(page: ft.Page):
                                 ]
                             )
                         ],
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                         spacing=0
                     )
                 ],
