@@ -1,31 +1,31 @@
 import flet as ft
-from controllers.UsuarioCtrl import UsuarioCtrl
+from decimal import Decimal
 from controllers.MateriaCtrl import MateriaCtrl
 from views.components.materia import Materia
 
 def dashboard(page: ft.Page):
+    txt_promedio = ft.Text(
+        "0",
+        size=87,
+        color=ft.Colors.WHITE,
+        weight=ft.FontWeight.BOLD
+    )
+    
     btn_modo = ft.IconButton(
         ft.Icons.CHECKLIST_ROUNDED,
         data="lec",
+        margin=ft.Margin(right=10),
         align=ft.Alignment.CENTER_RIGHT,
+        expand=True,
         on_click=lambda e: cambiar_modo(e)
     )
     
     materias = ft.Column(
         [
-            Materia(
-                m["id"],
-                m["nombre"],
-                m["parcial_1"],
-                m["parcial_2"],
-                m["parcial_3"],
-                m["promedio"],
-                lambda e: eliminar_materia(e)
-            ) for m in MateriaCtrl().obtener_data(page.session.store.get("user")) # type: ignore
+            ft.Container()
         ],
-        height=300,
-        margin=ft.Margin(1, 2, 1, 2),
-        spacing=5,
+        height=250,
+        spacing=1,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         scroll=ft.ScrollMode.AUTO
     )
@@ -103,11 +103,11 @@ def dashboard(page: ft.Page):
                         [
                             ft.Text(
                                 "Añadir Materia",
-                                size=20,
+                                size=15,
                                 weight=ft.FontWeight.W_600,
                                 align=ft.Alignment.CENTER,
                                 expand=True,
-                                margin=ft.Margin(right=50)
+                                margin=ft.Margin(50)
                             ),
                             ft.IconButton(
                                 ft.Icons.CLOSE,
@@ -123,16 +123,23 @@ def dashboard(page: ft.Page):
                             nombre,
                             alert_nombre,
                             ft.Row(
-                                [parcial_1, parcial_2, parcial_3]
+                                [parcial_1, parcial_2, parcial_3],
+                                ft.MainAxisAlignment.CENTER,
+                                margin=ft.Margin(top=5)
                             ),
                             alert_parcial,
                             alert_añadir,
                             ft.FilledButton(
-                                "Añadir Materia",
+                                ft.Text("Añadir Materia", size=16, weight=ft.FontWeight.W_600),
+                                bgcolor=ft.Colors.DEEP_ORANGE,
                                 width=300,
+                                style=ft.ButtonStyle(padding=15, shape=ft.RoundedRectangleBorder(radius=10)),
+                                margin=ft.Margin(top=15, bottom=10),
                                 on_click=lambda _: añadir_materia()
                             )
-                        ]
+                        ],
+                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                        spacing=0
                     )
                 ],
                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -142,7 +149,7 @@ def dashboard(page: ft.Page):
             padding=5
         ),
         bgcolor=ft.Colors.SURFACE,
-        shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius(15, 15, 0, 0)),
+        shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius(20, 20, 0, 0)),
         dismissible=False
     )
     
@@ -151,14 +158,14 @@ def dashboard(page: ft.Page):
         ft.Colors.WHITE,
         35,
         bgcolor=ft.Colors.DEEP_ORANGE,
-        width=325,
+        width=312,
         on_click=lambda _: abrir_shtAñadir()
     )
     
     btn_vaciar = ft.FilledButton(
-        ft.Text("Vaciar materias", size=25, color=ft.Colors.WHITE),
-        style=ft.ButtonStyle(bgcolor=ft.Colors.RED, padding=15),
-        width=325,
+        ft.Text("Vaciar materias", size=23, color=ft.Colors.WHITE),
+        style=ft.ButtonStyle(bgcolor=ft.Colors.RED, padding=17),
+        width=312,
         on_click=lambda _: abrir_shtEliminar(),
         visible=False
     )
@@ -216,8 +223,7 @@ def dashboard(page: ft.Page):
             e.control.icon = ft.Icons.CHECK_ROUNDED
             e.control.data = "del"
             
-        for materia in materias.controls:
-            materia.actualizar() # type: ignore
+        for materia in materias.controls: materia.actualizar() # type: ignore
         
         page.update()
     
@@ -283,9 +289,8 @@ def dashboard(page: ft.Page):
             Materia.modo_eliminar = False
             btn_modo.icon = ft.Icons.CHECKLIST_ROUNDED
             btn_modo.data = "lec"
-                
-            for materia in materias.controls:
-                materia.actualizar() # type: ignore
+            
+            for materia in materias.controls: materia.actualizar() # type: ignore
             
             actualizar_materias()
             sheet_eliminar.open = False
@@ -295,10 +300,19 @@ def dashboard(page: ft.Page):
     def actualizar_materias():
         data = MateriaCtrl().obtener_data(page.session.store.get("user")) # type: ignore
         
-        promedio_general = 0.0
+        promedio_general = Decimal(0.0)
         for m in data: # type: ignore
-            promedio_general += float(m["promedio"])
-        promedio_general = (promedio_general / len(data)) if promedio_general != 0.0 else promedio_general # type: ignore
+            promedio_general += m["promedio"]
+        promedio_general = (promedio_general / Decimal(len(data))) if promedio_general != Decimal(0.0) else promedio_general # type: ignore
+        txt_promedio.value = f"{round(float(promedio_general), 1):g}"
+        
+        if not data:
+            Materia.modo_eliminar = btn_modo.visible = btn_vaciar.visible = False
+            btn_añadir.visible = True
+            btn_modo.icon = ft.Icons.CHECKLIST_ROUNDED
+            btn_modo.data = "lec"
+                
+        else: btn_modo.visible = True
                 
         materias.controls = [
             Materia(
@@ -309,32 +323,12 @@ def dashboard(page: ft.Page):
                 m["parcial_3"],
                 m["promedio"],
                 lambda e: eliminar_materia(e)
-            ) for m in data # type: ignore
-        ]
+            ) for m in data
+        ] if data else [ft.Container()]
          
-        page.update()       
+        page.update()
     
-    user = UsuarioCtrl().obtener_data(page.session.store.get("user"), "especialidad") # type: ignore
-    
-    icono_perfil: ft.IconData | str
-    if user:
-        if user["especialidad"] == "programacion":
-            icono_perfil = "assets/icons/code_xml.svg"
-            
-        elif user["especialidad"] == "electronica":
-            icono_perfil = ft.Icons.MEMORY_ROUNDED
-            
-        elif user["especialidad"] == "contabilidad":
-            icono_perfil = ft.Icons.BALANCE_ROUNDED
-            
-        elif user["especialidad"] == "electricidad":
-            icono_perfil = ft.Icons.ELECTRIC_BOLT_ROUNDED
-    
-    data = MateriaCtrl().obtener_data(page.session.store.get("user")) # type: ignore
-    promedio_general = 0.0
-    for m in data: # type: ignore
-        promedio_general += float(m["promedio"])
-    promedio_general = (promedio_general / len(data)) if promedio_general != 0.0 else promedio_general # type: ignore
+    actualizar_materias()
     
     return ft.View(
         route="/dashboard",
@@ -352,36 +346,87 @@ def dashboard(page: ft.Page):
             ),
             ft.Column(
                 [
-                    ft.Card(
-                        ft.Stack(
-                            [
-                                ft.Icon(icono_perfil, size=125, color=ft.Colors.DEEP_ORANGE_500) 
-                                if isinstance(icono_perfil, ft.IconData) else 
-                                ft.Image(icono_perfil, width=125, color=ft.Colors.DEEP_ORANGE_500),
-                                ft.Column(
-                                    [
-                                        ft.Text("Promedio General"),
-                                        ft.Text(f"{float(promedio_general):g}")
-                                    ]
-                                )
-                            ],
-                            margin=ft.Margin(top=2)
-                        ),
-                        bgcolor=ft.Colors.DEEP_ORANGE,
-                        shadow_color=ft.Colors.TRANSPARENT,
-                        shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius(15, 15, 15, 15))
+                    ft.Row(
+                        [
+                            ft.Card(
+                                ft.Container(
+                                    ft.Column(
+                                        [
+                                            ft.Text(
+                                                "Promedio General", 
+                                                size=14,
+                                                color=ft.Colors.WHITE,
+                                                weight=ft.FontWeight.W_500
+                                            ),
+                                            txt_promedio
+                                        ],
+                                        ft.MainAxisAlignment.CENTER,
+                                        ft.CrossAxisAlignment.CENTER,
+                                        spacing=0
+                                    ),
+                                    height=150,
+                                    width=150,
+                                    padding=10
+                                ),
+                                expand=True,
+                                bgcolor=ft.Colors.DEEP_ORANGE,
+                                shadow_color=ft.Colors.TRANSPARENT,
+                                shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius(15, 15, 15, 15))
+                            ),
+                            ft.FilledButton(
+                                ft.Container(
+                                    ft.Column(
+                                        [
+                                            ft.Icon(
+                                                ft.Icons.PERSON, 
+                                                size=80,
+                                                color=ft.Colors.ON_SURFACE
+                                            ),
+                                            ft.Text(
+                                                "Perfil",
+                                                size=18,
+                                                color=ft.Colors.ON_SURFACE,
+                                                weight=ft.FontWeight.W_500
+                                            )
+                                        ],
+                                        ft.MainAxisAlignment.CENTER,
+                                        ft.CrossAxisAlignment.CENTER,
+                                        spacing=0
+                                    ),
+                                    height=150,
+                                    padding=10
+                                ),
+                                expand=True,
+                                bgcolor=ft.Colors.SURFACE_CONTAINER_HIGH,
+                                style=ft.ButtonStyle(
+                                    shadow_color=ft.Colors.TRANSPARENT,
+                                    shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius(15, 15, 15, 15))
+                                ),
+                                on_click=lambda _: page.go("/perfil")
+                            )
+                        ],
+                        expand=True,
+                        spacing=5
                     ),
                     ft.Column(
                         [
                             ft.Row(
                                 [
-                                    ft.Text("Mi Senda"),
+                                    ft.Text(
+                                        "Mi Senda",
+                                        style=ft.TextStyle(size=16, weight=ft.FontWeight.W_600),
+                                        margin=ft.Margin(10, bottom=15),
+                                        expand=True
+                                    ),
                                     btn_modo
                                 ],
+                                ft.MainAxisAlignment.CENTER,
+                                ft.CrossAxisAlignment.CENTER,
                                 expand=True
                             ),
                             ft.Card(
                                 materias,
+                                margin=ft.Margin(bottom=10),
                                 bgcolor=ft.Colors.SURFACE_CONTAINER_LOW,
                                 shadow_color=ft.Colors.TRANSPARENT,
                                 shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius(15, 15, 15, 15)),
@@ -391,19 +436,17 @@ def dashboard(page: ft.Page):
                                 [
                                     btn_añadir,
                                     btn_vaciar
-                                    # ft.IconButton(
-                                    #     ft.Icon(ft.Icons.PERSON_ROUNDED),
-                                    #     bgcolor=ft.Colors.SURFACE_CONTAINER_LOW,
-                                    #     col=2,
-                                    #     on_click=lambda _: page.go("/perfil")
-                                    # )
-                                ]
+                                ],
+                                ft.MainAxisAlignment.CENTER,
+                                ft.CrossAxisAlignment.CENTER
                             )
                         ],
+                        margin=ft.Margin(top=14),
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                         spacing=0
                     )
                 ],
+                margin=ft.Margin(top=9, right=3),
                 spacing=0
             )
         ],

@@ -62,7 +62,7 @@ def sesion(page: ft.Page):
             passw,
             alert_passw,
             ft.FilledButton(
-                ft.Text("Entrar", size=16, weight=ft.FontWeight.W_700, color=ft.Colors.WHITE),
+                ft.Text("Entrar", size=16, weight=ft.FontWeight.W_600, color=ft.Colors.WHITE),
                 bgcolor=ft.Colors.DEEP_ORANGE,
                 width=300,
                 style=ft.ButtonStyle(padding=15, shape=ft.RoundedRectangleBorder(radius=10)),

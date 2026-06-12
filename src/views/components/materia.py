@@ -1,5 +1,4 @@
 import flet as ft
-from typing import Callable
 from decimal import Decimal
 
 class Materia(ft.Card):
@@ -19,6 +18,7 @@ class Materia(ft.Card):
             ft.Colors.RED,
             40,
             data=id,
+            margin=ft.Margin(top=4, bottom=4),
             visible=Materia.modo_eliminar,
             on_click=onClick
         )
@@ -33,6 +33,7 @@ class Materia(ft.Card):
                                     nombre,
                                     size=25,
                                     weight=ft.FontWeight.W_500,
+                                    margin=ft.Margin(top=2),
                                     overflow=ft.TextOverflow.ELLIPSIS,
                                     tooltip=nombre
                                 ),
