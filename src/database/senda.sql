@@ -29,23 +29,23 @@ CREATE TABLE IF NOT EXISTS `materias` (
   `parcial_3` decimal(3,1) NOT NULL,
   `promedio` decimal(3,1) GENERATED ALWAYS AS ((`parcial_1` + `parcial_2` + `parcial_3`) / 3) STORED,
   PRIMARY KEY (`id`),
-  KEY `FK__usuarios` (`email_usuario`),
-  CONSTRAINT `FK__usuarios` FOREIGN KEY (`email_usuario`) REFERENCES `usuarios` (`email`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+  KEY `FK_materias_usuarios` (`email_usuario`),
+  CONSTRAINT `FK_materias_usuarios` FOREIGN KEY (`email_usuario`) REFERENCES `usuarios` (`email`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla senda.usuarios
 CREATE TABLE IF NOT EXISTS `usuarios` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre_completo` varchar(255) NOT NULL,
+  `nombres` varchar(255) NOT NULL,
   `apellidos` varchar(255) NOT NULL,
-  `especialidad` enum('Programación','Electrónica','Contabilidad','Electricidad') NOT NULL,
+  `especialidad` enum('programacion','electronica','contabilidad','electricidad') NOT NULL,
   `email` varchar(255) NOT NULL,
   `passw` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_spanish_ci;
 
 -- La exportación de datos fue deseleccionada.
 
